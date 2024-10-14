@@ -12,7 +12,6 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:fontFamily="@font/poppins_bold"
-        android:shadowColor="@android:color/black"
         android:text="Welcome, Aman Hashim"
         android:textColor="@color/black"
         android:textSize="20sp" />

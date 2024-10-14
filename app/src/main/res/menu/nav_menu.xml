@@ -1,16 +1,38 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Profile and Settings -->
     <item
         android:id="@+id/nav_profile"
         android:icon="@drawable/ic_profile"
-        android:title="Profile"/>
+        android:title="Profile" />
 
     <item
         android:id="@+id/nav_settings"
         android:icon="@drawable/ic_setting"
-        android:title="Settings"/>
+        android:title="Settings" />
 
+    <!-- Group for Claims -->
+    <group android:id="@+id/group_claims">
+        <item
+            android:id="@+id/nav_medical_claims"
+            android:icon="@drawable/ic_medical"
+            android:title="Medical Claims" />
+
+        <item
+            android:id="@+id/nav_visa_claims"
+            android:icon="@drawable/ic_visa"
+            android:title="Visa Claims" />
+
+        <item
+            android:id="@+id/nav_cocurricular_claims"
+            android:icon="@drawable/ic_cocurricular"
+            android:title="Cocurricular Claims" />
+    </group>
+
+    <!-- Logout Item (Appears with default divider above it) -->
     <item
         android:id="@+id/nav_logout"
         android:icon="@drawable/ic_logout"
-        android:title="Logout"/>
+        android:title="Logout" />
+
 </menu>

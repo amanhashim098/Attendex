@@ -49,6 +49,7 @@ class ProfileActivity : AppCompatActivity() {
 
         // Handle navigation menu item clicks
         val navView: NavigationView = findViewById(R.id.navigation_view)
+        navView.itemIconTintList = null
         navView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_profile -> { /* Handle Profile click */ }
