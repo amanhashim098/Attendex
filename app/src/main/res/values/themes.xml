@@ -1,0 +1,24 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Attendex" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
+
+    <style name="Theme.Attendex" parent="Base.Theme.Attendex" />
+
+    <style name="HintTextAppearance">
+        <item name="android:textColorHint">@color/hintColor</item> <!-- Color for the hint text -->
+        <item name="android:textSize">14sp</item> <!-- Size of the hint text -->
+        <item name="android:fontFamily">sans-serif</item> <!-- Font family -->
+        <item name="android:textStyle">italic</item> <!-- Style of the hint text -->
+    </style>
+
+    <style name="Theme.Attendex.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.Attendex.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="Theme.Attendex.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+</resources>
