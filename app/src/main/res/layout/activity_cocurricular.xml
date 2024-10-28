@@ -154,6 +154,36 @@
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/teacher_spinner_layout"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:textColorHint="@color/login_input_color"
+                    app:boxCornerRadiusBottomEnd="2dp"
+                    app:boxCornerRadiusBottomStart="2dp"
+                    app:boxCornerRadiusTopEnd="2dp"
+                    app:boxCornerRadiusTopStart="2dp"
+                    app:boxStrokeColor="@color/input_color_selector"
+                    app:boxStrokeWidth="2dp"
+                    app:hintTextColor="@color/login_input_color"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/event_input_layout">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/teacher_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter"
+                        android:hint="@string/select_teacher"
+                        android:inputType="none"
+                        android:textSize="16sp"
+                        tools:ignore="SpeakableTextPresentCheck" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
                 <RadioGroup
                     android:id="@+id/activity_type_group"
                     android:layout_width="0dp"
@@ -162,7 +192,7 @@
                     android:orientation="vertical"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/event_input_layout">
+                    app:layout_constraintTop_toBottomOf="@id/teacher_spinner_layout">
 
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/co_curricular_radio"
@@ -236,9 +266,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:columnCount="3"
-                        android:orientation="horizontal"
-                        android:rowCount="2">
+                        android:columnCount="6"
+                        android:orientation="horizontal">
 
                         <com.google.android.material.checkbox.MaterialCheckBox
                             android:id="@+id/p1"

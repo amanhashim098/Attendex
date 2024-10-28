@@ -36,23 +36,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/inter_bold"
-                android:text="Aman"
-                android:textColor="@color/profile_text_color"
+                android:text="Aman Hashim"
+                android:textColor="@android:color/holo_blue_bright"
                 android:textSize="26sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/welcomeText" />
 
-            <TextView
-                android:id="@+id/lastNameText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:fontFamily="@font/inter_bold"
-                android:text="Hashim"
-                android:textColor="@android:color/holo_blue_light"
-                android:textSize="26sp"
-                app:layout_constraintStart_toEndOf="@id/nameText"
-                app:layout_constraintTop_toBottomOf="@id/welcomeText" />
+
 
             <!-- Profile Image -->
             <com.google.android.material.imageview.ShapeableImageView

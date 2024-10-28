@@ -34,4 +34,5 @@
     <string name="visa_claims">Visa Claims</string>
     <string name="medical_claims">Medical Claims</string>
     <string name="name">Name</string>
+    <string name="select_teacher">Select Teacher</string>
 </resources>

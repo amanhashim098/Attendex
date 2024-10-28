@@ -2,6 +2,8 @@ package com.example.attendex
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import com.example.attendex.R
@@ -18,6 +20,11 @@ class MedicalActivity : AppCompatActivity() {
 
         startDateInput = findViewById(R.id.start_date_input)
         endDateInput = findViewById(R.id.end_date_input)
+
+        val teacherSpinner: AutoCompleteTextView = findViewById(R.id.teacher_spinner)
+        val teachers = arrayOf("Fabiola Pohrmen", "Resmi K R", "Vineetha K R", "Arokia Paul")
+        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, teachers)
+        teacherSpinner.setAdapter(adapter)
 
         startDateInput.setOnClickListener {
             showDatePickerDialog { date ->
