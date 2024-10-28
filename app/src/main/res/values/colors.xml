@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
+    <color name="black">#141414</color>
     <color name="white">#FFFFFFFF</color>
     <color name="hintColor">#A0A0A0</color>
-
+    <color name="colorPrimary">#2B91ED</color>
+    <color name="colorGrey">#313131</color>
+    <color name="colorStop">#8946fc</color>
+    <color name="transparent">#00000000</color>
+    <color name="colorPrimaryDark">#196CB6</color>
+    <color name="colorIcon">#4ea8de</color>
+    <color name="selected_color">#fff</color>
+    <color name="unselected_color">#4CC9F0</color>
+    <color name="login_input_color">#4a4a4a</color>
+    <color name="profile_text_color">#141414</color>
+    <color name="form_text_color">#141414</color>
+    <color name="form_bg_color">#fff</color>
+    <color name="GlowColor">#0408F6</color>
 </resources>

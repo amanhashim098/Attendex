@@ -1,10 +1,37 @@
 <resources>
+    <!-- General App Strings -->
     <string name="app_name">Attendex</string>
+
+    <!-- Drawer Navigation Strings -->
     <string name="navigation_drawer_open">Open drawer</string>
     <string name="navigation_drawer_close">Close drawer</string>
     <string name="hamburger_icon">Hamburger Icon</string>
-    <string name="nav_profile">Profile\n</string>
+    <string name="nav_profile">Profile</string>
     <string name="nav_settings">Settings</string>
     <string name="nav_logout">Log Out</string>
 
+    <!-- Medical Claims Form Strings -->
+    <string name="claims_form_title">Medical Claims Form</string>
+    <string name="enter_student_name">Enter Student Name</string>
+    <string name="enter_reason_for_claim">Enter Reason for Claim</string>
+    <string name="start_date">Start Date</string>
+    <string name="end_date">End Date</string>
+    <string name="submit_button">Submit</string>
+
+    <!-- Navigation Header Strings -->
+    <string name="nav_header_title">Attendex</string>
+    <string name="nav_header_subtitle">Medical Claims Management</string>
+
+    <!-- File Attachment Strings -->
+    <string name="attach_document">Attach Document</string>
+    <string name="choose_method">Choose Method</string>
+    <string name="gallery">Gallery</string>
+    <string name="camera">Camera</string>
+    <string name="image_captured">Image Captured Successfully!</string>
+    <string name="password">Password</string>
+    <string name="student_id">Student ID</string>
+    <string name="co_curricular_claims">Co-Curricular Claims</string>
+    <string name="visa_claims">Visa Claims</string>
+    <string name="medical_claims">Medical Claims</string>
+    <string name="name">Name</string>
 </resources>

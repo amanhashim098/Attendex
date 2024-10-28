@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/form_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
+            android:fontFamily="@font/inter_semibold"
+            android:gravity="center"
+            android:text="Co-curricular Claims Form"
+            android:textColor="@color/form_text_color"
+            android:textSize="24sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="@color/form_bg_color"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            app:cardUseCompatPadding="true"
+            app:contentPadding="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/form_title">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/name_input_layout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColorHint="#BABABA"
+                    app:boxCornerRadiusBottomEnd="2dp"
+                    app:boxCornerRadiusBottomStart="2dp"
+                    app:boxCornerRadiusTopEnd="2dp"
+                    app:boxCornerRadiusTopStart="2dp"
+                    app:boxStrokeColor="@color/input_color_selector"
+                    app:boxStrokeWidth="2dp"
+                    app:hintAnimationEnabled="true"
+                    app:hintEnabled="true"
+                    app:hintTextColor="#C7C3C3"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/name_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter"
+                        android:hint="@string/name"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/class_input_layout"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="8dp"
+                    android:textColorHint="@color/login_input_color"
+                    app:boxCornerRadiusBottomEnd="2dp"
+                    app:boxCornerRadiusBottomStart="2dp"
+                    app:boxCornerRadiusTopEnd="2dp"
+                    app:boxCornerRadiusTopStart="2dp"
+                    app:boxStrokeColor="@color/input_color_selector"
+                    app:boxStrokeWidth="2dp"
+                    app:hintTextColor="@color/login_input_color"
+                    app:layout_constraintEnd_toStartOf="@+id/roll_input_layout"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/name_input_layout">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/class_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter"
+                        android:hint="Class"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/roll_input_layout"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginStart="8dp"
+                    android:textColorHint="@color/login_input_color"
+                    app:boxCornerRadiusBottomEnd="2dp"
+                    app:boxCornerRadiusBottomStart="2dp"
+                    app:boxCornerRadiusTopEnd="2dp"
+                    app:boxCornerRadiusTopStart="2dp"
+                    app:boxStrokeColor="@color/input_color_selector"
+                    app:boxStrokeWidth="2dp"
+                    app:hintTextColor="@color/login_input_color"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/class_input_layout"
+                    app:layout_constraintTop_toBottomOf="@id/name_input_layout">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/roll_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter"
+                        android:hint="Roll Number"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/event_input_layout"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:textColorHint="@color/login_input_color"
+                    app:boxCornerRadiusBottomEnd="2dp"
+                    app:boxCornerRadiusBottomStart="2dp"
+                    app:boxCornerRadiusTopEnd="2dp"
+                    app:boxCornerRadiusTopStart="2dp"
+                    app:boxStrokeColor="@color/input_color_selector"
+                    app:boxStrokeWidth="2dp"
+                    app:hintTextColor="@color/login_input_color"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/class_input_layout">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/event_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter"
+                        android:hint="Name of Event"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <RadioGroup
+                    android:id="@+id/activity_type_group"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/event_input_layout">
+
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/co_curricular_radio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:buttonTint="@color/radio_color_selector"
+                        android:fontFamily="@font/inter_semibold"
+                        android:text="Co-curricular"
+                        android:textColor="@color/form_text_color"
+                        android:textSize="16sp" />
+
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/extra_curricular_radio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter_semibold"
+                        android:text="Extra-curricular"
+                        android:textColor="@color/form_text_color"
+                        android:textSize="16sp"
+                        app:buttonTint="@color/radio_color_selector" />
+
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/dept_activities_radio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter_semibold"
+                        android:text="Dept. Activities"
+                        android:textColor="@color/form_text_color"
+                        android:textSize="16sp"
+                        app:buttonTint="@color/radio_color_selector" />
+                </RadioGroup>
+
+                <LinearLayout
+                    android:id="@+id/date_and_periods"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/activity_type_group">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/date_input_layout"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColorHint="@color/login_input_color"
+                        app:boxCornerRadiusBottomEnd="2dp"
+                        app:boxCornerRadiusBottomStart="2dp"
+                        app:boxCornerRadiusTopEnd="2dp"
+                        app:boxCornerRadiusTopStart="2dp"
+                        app:boxStrokeColor="@color/input_color_selector"
+                        app:boxStrokeWidth="2dp"
+                        app:hintTextColor="@color/login_input_color">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/date_input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="false"
+                            android:fontFamily="@font/inter"
+                            android:hint="Select Date"
+                            android:onClick="showDatePicker"
+                            android:textSize="16sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <GridLayout
+                        android:id="@+id/periods_grid"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:columnCount="3"
+                        android:orientation="horizontal"
+                        android:rowCount="2">
+
+                        <com.google.android.material.checkbox.MaterialCheckBox
+                            android:id="@+id/p1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/inter_semibold"
+                            android:text="P1"
+                            android:textColor="@color/form_text_color"
+                            android:textSize="16sp"
+                            app:buttonTint="@color/form_text_color" />
+
+                        <com.google.android.material.checkbox.MaterialCheckBox
+                            android:id="@+id/p2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/inter_semibold"
+                            android:text="P2"
+                            android:textColor="@color/form_text_color"
+                            android:textSize="16sp"
+                            app:buttonTint="@color/form_text_color" />
+
+                        <com.google.android.material.checkbox.MaterialCheckBox
+                            android:id="@+id/p3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/inter_semibold"
+                            android:text="P3"
+                            android:textColor="@color/form_text_color"
+                            android:textSize="16sp"
+                            app:buttonTint="@color/form_text_color" />
+
+                        <com.google.android.material.checkbox.MaterialCheckBox
+                            android:id="@+id/p4"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/inter_semibold"
+                            android:text="P4"
+                            android:textColor="@color/form_text_color"
+                            android:textSize="16sp"
+                            app:buttonTint="@color/form_text_color" />
+
+                        <com.google.android.material.checkbox.MaterialCheckBox
+                            android:id="@+id/p5"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:fontFamily="@font/inter_semibold"
+                            android:text="P5"
+                            android:textColor="@color/form_text_color"
+                            android:textSize="16sp"
+                            app:buttonTint="@color/form_text_color" />
+
+                        <com.google.android.material.checkbox.MaterialCheckBox
+                            android:id="@+id/p6"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/inter_semibold"
+                            android:text="P6"
+                            android:textColor="@color/form_text_color"
+                            android:textSize="16sp"
+                            app:buttonTint="@color/form_text_color" />
+                    </GridLayout>
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/attach_certificate_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="120dp"
+                    android:fontFamily="@font/inter_semibold"
+                    android:text="Attach Certificate"
+                    android:textColor="@color/white"
+                    app:backgroundTint="@color/colorPrimary"
+                    app:cornerRadius="2dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/date_and_periods" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/other_documents_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="120dp"
+                    android:fontFamily="@font/inter_semibold"
+                    android:text="Other Documents"
+                    android:textColor="@color/white"
+                    app:backgroundTint="@color/colorPrimary"
+                    app:cornerRadius="2dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/attach_certificate_button" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/submit_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="@font/inter_semibold"
+                    android:text="Submit"
+                    android:textColor="@color/form_text_color"
+                    app:backgroundTint="@color/form_bg_color"
+                    app:cornerRadius="2dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/other_documents_button"
+                    app:rippleColor="@color/colorPrimary"
+                    app:strokeColor="@color/form_text_color"
+                    app:strokeWidth="2dp" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

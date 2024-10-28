@@ -1,0 +1,11 @@
+<resources>
+    <color name="profile_text_color">#fff</color>
+    <color name="GlowColor">#2B91ED</color>
+    <color name="black">#141414</color>
+    <color name="form_text_color">#fff</color>
+    <color name="form_bg_color">#141414</color>
+    <color name="login_input_color">#BABABA</color>
+
+
+
+</resources>

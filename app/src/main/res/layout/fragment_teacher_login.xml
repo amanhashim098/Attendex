@@ -1,61 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="24dp">
 
+    <!-- Teacher ID Field -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/teacherIdLayout"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
         android:layout_marginTop="32dp"
         android:hint="Teacher ID"
+        android:textColorHint="@color/login_input_color"
+        app:boxBackgroundColor="#EEEEEE"
+        app:boxBackgroundMode="filled"
+        app:boxCornerRadiusBottomEnd="15dp"
+        app:boxCornerRadiusBottomStart="15dp"
+        app:boxCornerRadiusTopEnd="15dp"
+        app:boxCornerRadiusTopStart="15dp"
+        app:boxStrokeWidth="0dp"
+        app:boxStrokeWidthFocused="0dp"
+        app:hintTextColor="@color/login_input_color"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.9">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/teacherIdInput"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
             android:fontFamily="@font/inter"
-            android:inputType="text" />
+            android:inputType="text"
+            android:maxLines="1"
+            android:padding="12dp"
+            android:textColorHint="#4A4A4A" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- Password Field -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/teacherPasswordLayout"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginTop="32dp"
         android:hint="Password"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/teacherIdLayout"
+        android:textColorHint="@color/login_input_color"
+        app:boxBackgroundColor="#EEEEEE"
+        app:boxBackgroundMode="filled"
+        app:boxCornerRadiusBottomEnd="15dp"
+        app:boxCornerRadiusBottomStart="15dp"
+        app:boxCornerRadiusTopEnd="15dp"
+        app:boxCornerRadiusTopStart="15dp"
+        app:boxStrokeWidth="0dp"
+        app:boxStrokeWidthFocused="0dp"
+        app:hintTextColor="@color/login_input_color"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/teacherIdLayout"
+        app:layout_constraintWidth_percent="0.9">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/teacherPasswordInput"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
             android:fontFamily="@font/inter"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+            android:maxLines="1"
+            android:padding="12dp"
+            android:textColorHint="#4A4A4A" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- Login Button -->
     <Button
         android:id="@+id/teacherLoginButton"
-        android:layout_width="143dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="24dp"
-        android:backgroundTint="#2196F3"
+        android:layout_width="0dp"
+        android:layout_height="65dp"
+        android:layout_marginTop="32dp"
+        android:backgroundTint="@color/colorPrimary"
         android:fontFamily="@font/poppins_bold"
         android:text="Login"
-        app:cornerRadius="10px"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        app:cornerRadius="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/teacherPasswordLayout" />
+        app:layout_constraintTop_toBottomOf="@id/teacherPasswordLayout"
+        app:layout_constraintWidth_percent="0.75" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

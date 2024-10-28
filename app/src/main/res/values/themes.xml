@@ -1,24 +1,40 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!-- Base application theme -->
     <style name="Base.Theme.Attendex" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <!-- Customize your light theme here -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+        <item name="android:windowBackground">@android:color/white</item>
     </style>
 
     <style name="Theme.Attendex" parent="Base.Theme.Attendex" />
 
-    <style name="HintTextAppearance">
-        <item name="android:textColorHint">@color/hintColor</item> <!-- Color for the hint text -->
-        <item name="android:textSize">14sp</item> <!-- Size of the hint text -->
-        <item name="android:fontFamily">sans-serif</item> <!-- Font family -->
-        <item name="android:textStyle">italic</item> <!-- Style of the hint text -->
+    <!-- AppBar theme -->
+    <style name="AppBarTheme" parent="ThemeOverlay.MaterialComponents.ActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorOnPrimary">@android:color/white</item>
     </style>
 
-    <style name="Theme.Attendex.NoActionBar">
+    <!-- Hint Text Appearance -->
+    <style name="HintTextAppearance">
+        <item name="android:textColorHint">@color/hintColor</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">italic</item>
+    </style>
+
+    <!-- Theme without Action Bar -->
+    <style name="Theme.Attendex.NoActionBar" parent="Base.Theme.Attendex">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
+    <style name="CustomSmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
 
+    <!-- App Bar Overlay and Popup Styles -->
     <style name="Theme.Attendex.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
     <style name="Theme.Attendex.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

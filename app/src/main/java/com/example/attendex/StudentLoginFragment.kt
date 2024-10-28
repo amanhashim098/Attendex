@@ -9,12 +9,11 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.google.firebase.firestore.FirebaseFirestore
 
 class StudentLoginFragment : Fragment() {
 
-    // Commented out for testing purposes
-    // private val validRegNo = "2341603"
-    // private val validPassword = "12345678"
+    private val db = FirebaseFirestore.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,28 +29,73 @@ class StudentLoginFragment : Fragment() {
             val enteredRegNo = regNoInput.text.toString()
             val enteredPassword = passwordInput.text.toString()
 
-            // Commenting out validation to allow access for testing
-            // if (enteredRegNo == validRegNo && enteredPassword == validPassword) {
-
-            // Successful login, redirect to ProfileActivity
-            val intent = Intent(requireContext(), ProfileActivity::class.java).apply {
-                putExtra("studentName", "Aman Hashim")
-                putExtra("className", "3BCA B")
-                putExtra("attendancePercentage", "92%")
-                putExtra("aggregatePercentage", "73%")
-                putExtra("totalHours", "321")
-                putExtra("hoursMissed", "21")
+            // Validate input fields
+            if (enteredRegNo.isEmpty() || enteredPassword.isEmpty()) {
+                Toast.makeText(activity, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
-            startActivity(intent)
 
-            activity?.finish() // Optionally finish the current activity
-
-            // } else {
-            //     // Show error message
-            //     Toast.makeText(activity, "Invalid registration number or password", Toast.LENGTH_SHORT).show()
-            // }
+            // Call the login function
+            loginUser(enteredRegNo, enteredPassword)
         }
 
         return view
     }
+
+    private fun loginUser(regNo: String, password: String) {
+        try {
+            // Convert the input to Long (matching Firestore's 'number' type)
+            val regNoLong = regNo.toLong()
+            val passwordLong = password.toLong()
+
+            // Display entered regno and password for testing
+            Toast.makeText(
+                activity,
+                "Entered RegNo: $regNoLong, Password: $passwordLong",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            // Query Firestore with the numeric 'regno'
+            db.collection("students")
+                .whereEqualTo("regno", regNoLong)
+                .get()
+                .addOnSuccessListener { documents ->
+                    if (documents.isEmpty) {
+                        Toast.makeText(
+                            activity,
+                            "No student found with RegNo: $regNoLong",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        for (document in documents) {
+                            val storedPassword = document.getLong("pass")
+                            if (storedPassword == passwordLong) {
+                                // Successful login, redirect to ProfileActivity
+                                val intent = Intent(activity, ProfileActivity::class.java)
+                                startActivity(intent)
+                                activity?.finish()
+                            } else {
+                                // Invalid password
+                                Toast.makeText(
+                                    activity,
+                                    "Invalid password for RegNo: $regNoLong",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(activity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        } catch (e: NumberFormatException) {
+            // Handle invalid input
+            Toast.makeText(
+                activity,
+                "Invalid input. Enter numeric RegNo and Password.",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
 }
+
