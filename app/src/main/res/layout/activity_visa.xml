@@ -29,14 +29,13 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="104dp"
+            android:layout_marginTop="16dp"
             app:cardBackgroundColor="@color/form_bg_color"
             app:cardCornerRadius="16dp"
             app:cardElevation="8dp"
             app:cardUseCompatPadding="true"
             app:contentPadding="16dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/form_title">
 
@@ -244,36 +243,66 @@
                         android:focusable="false"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/attach_certificate_button"
+                    android:id="@+id/attach_flight_ticket_button"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
-                    android:layout_marginEnd="120dp"
+                    android:layout_marginEnd="16dp"
                     android:fontFamily="@font/inter_semibold"
                     android:text="Attach Flight Ticket"
                     android:textColor="@color/white"
                     app:backgroundTint="@color/colorPrimary"
                     app:cornerRadius="2dp"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/preview_flight_ticket_button"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/start_date_input_layout" />
+                    app:layout_constraintTop_toBottomOf="@id/end_date_input_layout" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/preview_flight_ticket_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_semibold"
+                    android:text="Preview"
+                    android:textColor="@color/colorPrimary"
+                    app:backgroundTint="@color/form_bg_color"
+                    app:strokeColor="@color/colorPrimary"
+                    app:strokeWidth="2dp"
+                    app:cornerRadius="2dp"
+                    app:layout_constraintBottom_toBottomOf="@id/attach_flight_ticket_button"
+
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/attach_flight_ticket_button" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/other_documents_button"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:layout_marginEnd="120dp"
+                    android:layout_marginEnd="16dp"
                     android:fontFamily="@font/inter_semibold"
                     android:text="Other Documents"
                     android:textColor="@color/white"
                     app:backgroundTint="@color/colorPrimary"
                     app:cornerRadius="2dp"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/preview_other_documents_button"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/attach_certificate_button" />
+                    app:layout_constraintTop_toBottomOf="@id/attach_flight_ticket_button" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/preview_other_documents_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_semibold"
+                    android:text="Preview"
+                    android:textColor="@color/colorPrimary"
+                    app:backgroundTint="@color/form_bg_color"
+                    app:strokeColor="@color/colorPrimary"
+                    app:strokeWidth="2dp"
+                    app:cornerRadius="2dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/other_documents_button"
+                    app:layout_constraintBottom_toBottomOf="@id/other_documents_button" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/submit_button"
