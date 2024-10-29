@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -42,6 +43,7 @@ class VisaActivity : AppCompatActivity() {
     private lateinit var currentPhotoPath: String
     private var isCapturingFlightTicket = true
     private lateinit var db: FirebaseFirestore
+    private lateinit var storage: FirebaseStorage
 
     companion object {
         private const val REQUEST_IMAGE_CAPTURE = 1
@@ -53,6 +55,7 @@ class VisaActivity : AppCompatActivity() {
         setContentView(R.layout.activity_visa)
 
         db = FirebaseFirestore.getInstance()
+        storage = FirebaseStorage.getInstance()
 
         setupViews()
         setupDatePickers()
@@ -235,6 +238,50 @@ class VisaActivity : AppCompatActivity() {
             return
         }
 
+        uploadImagesAndSubmitClaim(name, className, rollNumber, reason, teacher, startDate, endDate)
+    }
+
+    private fun uploadImagesAndSubmitClaim(name: String, className: String, rollNumber: String, reason: String, teacher: String, startDate: String, endDate: String) {
+        val flightTicketFile = if (isCapturingFlightTicket) File(currentPhotoPath) else null
+        val otherDocumentFile = if (!isCapturingFlightTicket) File(currentPhotoPath) else null
+
+        val uploadTasks = mutableListOf<Pair<String, File?>>()
+        if (flightTicketFile != null) {
+            uploadTasks.add("flightTicket" to flightTicketFile)
+        }
+        if (otherDocumentFile != null) {
+            uploadTasks.add("otherDocument" to otherDocumentFile)
+        }
+
+        val uploadedUrls = mutableMapOf<String, String>()
+
+        fun uploadNextImage() {
+            if (uploadTasks.isEmpty()) {
+                // All images uploaded, now submit the claim
+                submitClaim(name, className, rollNumber, reason, teacher, startDate, endDate, uploadedUrls)
+                return
+            }
+
+            val (type, file) = uploadTasks.removeAt(0)
+            val storageRef = storage.reference.child("visaClaims/${file?.name}")
+
+            storageRef.putFile(Uri.fromFile(file))
+                .addOnSuccessListener { taskSnapshot ->
+                    taskSnapshot.storage.downloadUrl.addOnSuccessListener { uri ->
+                        uploadedUrls[type] = uri.toString()
+                        uploadNextImage()
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Failed to upload $type: ${e.message}", Toast.LENGTH_SHORT).show()
+                    uploadNextImage()
+                }
+        }
+
+        uploadNextImage()
+    }
+
+    private fun submitClaim(name: String, className: String, rollNumber: String, reason: String, teacher: String, startDate: String, endDate: String, uploadedUrls: Map<String, String>) {
         val visaClaim = hashMapOf(
             "name" to name,
             "class" to className,
@@ -243,8 +290,8 @@ class VisaActivity : AppCompatActivity() {
             "teacher" to teacher,
             "startDate" to startDate,
             "endDate" to endDate,
-            "flightTicketPath" to (if (isCapturingFlightTicket) currentPhotoPath else ""),
-            "otherDocumentPath" to (if (!isCapturingFlightTicket) currentPhotoPath else ""),
+            "flightTicketUrl" to (uploadedUrls["flightTicket"] ?: ""),
+            "otherDocumentUrl" to (uploadedUrls["otherDocument"] ?: ""),
             "timestamp" to com.google.firebase.Timestamp.now()
         )
 
@@ -258,6 +305,7 @@ class VisaActivity : AppCompatActivity() {
                 Toast.makeText(this, "Error submitting visa claim: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
+
     private fun clearForm() {
         nameInput.text.clear()
         classInput.text.clear()
