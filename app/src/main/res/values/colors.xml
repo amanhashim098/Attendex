@@ -16,4 +16,6 @@
     <color name="form_text_color">#141414</color>
     <color name="form_bg_color">#fff</color>
     <color name="GlowColor">#0408F6</color>
+    <color name="green">#42CD7C</color>
+    <color name="red">#EC1111</color>
 </resources>

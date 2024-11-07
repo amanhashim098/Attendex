@@ -1,5 +1,6 @@
 package com.example.attendex
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -23,7 +24,13 @@ class TeacherLoginFragment : Fragment(R.layout.fragment_teacher_login) {
             val password = teacherPasswordInput.text.toString()
 
             if (teacherId.isNotEmpty() && password.isNotEmpty()) {
+                // Show a success message
                 Toast.makeText(requireContext(), "Teacher Login Successful", Toast.LENGTH_SHORT).show()
+
+                // Create an Intent to navigate to TeacherProfileActivity
+                val intent = Intent(requireContext(), TeacherProfileActivity::class.java)
+                intent.putExtra("TEACHER_ID", teacherId)  // Pass teacher ID to the profile activity
+                startActivity(intent)
             } else {
                 Toast.makeText(requireContext(), "Please enter all fields", Toast.LENGTH_SHORT).show()
             }

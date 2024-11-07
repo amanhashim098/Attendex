@@ -18,6 +18,10 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.checkbox.MaterialCheckBox
+import com.google.android.material.radiobutton.MaterialRadioButton
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -25,14 +29,29 @@ import java.util.*
 
 class CoCurricularActivity : AppCompatActivity() {
 
+    private lateinit var nameInput: EditText
+    private lateinit var classInput: EditText
+    private lateinit var rollInput: EditText
+    private lateinit var eventInput: EditText
+    private lateinit var teacherSpinner: AutoCompleteTextView
     private lateinit var dateInput: EditText
     private lateinit var attachCertificateButton: MaterialButton
     private lateinit var previewCertificateButton: MaterialButton
     private lateinit var otherDocumentsButton: MaterialButton
     private lateinit var previewOtherDocumentsButton: MaterialButton
+    private lateinit var submitButton: MaterialButton
+    private lateinit var coCurricularRadio: MaterialRadioButton
+    private lateinit var extraCurricularRadio: MaterialRadioButton
+    private lateinit var deptActivitiesRadio: MaterialRadioButton
+    private lateinit var periodCheckboxes: List<MaterialCheckBox>
 
     private lateinit var currentPhotoPath: String
     private var isCapturingCertificate = true
+    private var certificateUri: Uri? = null
+    private var otherDocumentUri: Uri? = null
+
+    private lateinit var db: FirebaseFirestore
+    private lateinit var storage: FirebaseStorage
 
     companion object {
         private const val REQUEST_IMAGE_CAPTURE = 1
@@ -43,15 +62,26 @@ class CoCurricularActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cocurricular)
 
+        db = FirebaseFirestore.getInstance()
+        storage = FirebaseStorage.getInstance()
+
         setupViews()
         setupDatePicker()
         setupButtons()
+        setupPeriodCheckboxes()
     }
 
     private fun setupViews() {
+        nameInput = findViewById(R.id.name_input)
+        classInput = findViewById(R.id.class_input)
+        rollInput = findViewById(R.id.roll_input)
+        eventInput = findViewById(R.id.event_input)
+        teacherSpinner = findViewById(R.id.teacher_spinner)
         dateInput = findViewById(R.id.date_input)
+        coCurricularRadio = findViewById(R.id.co_curricular_radio)
+        extraCurricularRadio = findViewById(R.id.extra_curricular_radio)
+        deptActivitiesRadio = findViewById(R.id.dept_activities_radio)
 
-        val teacherSpinner: AutoCompleteTextView = findViewById(R.id.teacher_spinner)
         val teachers = arrayOf("Fabiola Pohrmen", "Resmi K R", "Vineetha K R", "Arokia Paul")
         val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, teachers)
         teacherSpinner.setAdapter(adapter)
@@ -70,6 +100,7 @@ class CoCurricularActivity : AppCompatActivity() {
         previewCertificateButton = findViewById(R.id.preview_certificate_button)
         otherDocumentsButton = findViewById(R.id.other_documents_button)
         previewOtherDocumentsButton = findViewById(R.id.preview_other_documents_button)
+        submitButton = findViewById(R.id.submit_button)
 
         attachCertificateButton.setOnClickListener {
             isCapturingCertificate = true
@@ -84,8 +115,21 @@ class CoCurricularActivity : AppCompatActivity() {
         previewCertificateButton.setOnClickListener { previewImage(isCapturingCertificate) }
         previewOtherDocumentsButton.setOnClickListener { previewImage(!isCapturingCertificate) }
 
+        submitButton.setOnClickListener { uploadFormData() }
+
         previewCertificateButton.isEnabled = false
         previewOtherDocumentsButton.isEnabled = false
+    }
+
+    private fun setupPeriodCheckboxes() {
+        periodCheckboxes = listOf(
+            findViewById(R.id.p1),
+            findViewById(R.id.p2),
+            findViewById(R.id.p3),
+            findViewById(R.id.p4),
+            findViewById(R.id.p5),
+            findViewById(R.id.p6)
+        )
     }
 
     private fun showDatePickerDialog(onDateSet: (String) -> Unit) {
@@ -168,19 +212,6 @@ class CoCurricularActivity : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
-            if (isCapturingCertificate) {
-                attachCertificateButton.text = "Certificate Attached"
-                previewCertificateButton.isEnabled = true
-            } else {
-                otherDocumentsButton.text = "Document Attached"
-                previewOtherDocumentsButton.isEnabled = true
-            }
-        }
-    }
-
     private fun previewImage(isCertificate: Boolean) {
         val photoURI = FileProvider.getUriForFile(
             this,
@@ -192,5 +223,120 @@ class CoCurricularActivity : AppCompatActivity() {
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
         startActivity(intent)
+    }
+
+    private fun uploadFormData() {
+        val name = nameInput.text.toString()
+        val className = classInput.text.toString()
+        val regNo = rollInput.text.toString()
+        val event = eventInput.text.toString()
+        val teacher = teacherSpinner.text.toString()
+        val date = dateInput.text.toString()
+        val activityType = when {
+            coCurricularRadio.isChecked -> "Co-curricular"
+            extraCurricularRadio.isChecked -> "Extra-curricular"
+            deptActivitiesRadio.isChecked -> "Dept. Activities"
+            else -> ""
+        }
+        val periodsMissed = periodCheckboxes.mapIndexedNotNull { index, checkbox ->
+            if (checkbox.isChecked) "P${index + 1}" else null
+        }
+
+        if (name.isEmpty() || className.isEmpty() || regNo.isEmpty() || event.isEmpty() || teacher.isEmpty() || date.isEmpty() || activityType.isEmpty()) {
+            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val formData = hashMapOf(
+            "name" to name,
+            "class" to className,
+            "regNo" to regNo,
+            "event" to event,
+            "teacher" to teacher,
+            "date" to date,
+            "activityType" to activityType,
+            "periodsMissed" to periodsMissed,
+            "timestamp" to com.google.firebase.Timestamp.now()
+        )
+
+        db.collection("coCurricularClaims").document(regNo)
+            .set(formData)
+            .addOnSuccessListener {
+                uploadImages(regNo)
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error submitting form: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun uploadImages(regNo: String) {
+        val certificateRef = storage.reference.child("coCurricularClaims/${regNo}_cc.jpg")
+        val otherDocumentRef = storage.reference.child("coCurricularClaims/${regNo}_od.jpg")
+
+        var uploadedCount = 0
+        var totalUploads = 0
+
+        certificateUri?.let {
+            totalUploads++
+            certificateRef.putFile(it)
+                .addOnSuccessListener {
+                    uploadedCount++
+                    checkUploadCompletion(regNo, uploadedCount, totalUploads)
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Error uploading certificate: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+
+        otherDocumentUri?.let {
+            totalUploads++
+            otherDocumentRef.putFile(it)
+                .addOnSuccessListener {
+                    uploadedCount++
+                    checkUploadCompletion(regNo, uploadedCount, totalUploads)
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Error uploading other document: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+
+        if (totalUploads == 0) {
+            Toast.makeText(this, "Form submitted successfully", Toast.LENGTH_SHORT).show()
+            finish()
+        }
+    }
+
+    private fun checkUploadCompletion(regNo: String, uploadedCount: Int, totalUploads: Int) {
+        if (uploadedCount == totalUploads) {
+            db.collection("coCurricularClaims").document(regNo)
+                .update("imagesUploaded", true)
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Form and images submitted successfully", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Error updating image status: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
+            val photoUri = FileProvider.getUriForFile(
+                this,
+                "com.example.attendex.fileprovider",
+                File(currentPhotoPath)
+            )
+            if (isCapturingCertificate) {
+                certificateUri = photoUri
+                attachCertificateButton.text = "Certificate Attached"
+                previewCertificateButton.isEnabled = true
+            } else {
+                otherDocumentUri = photoUri
+                otherDocumentsButton.text = "Document Attached"
+                previewOtherDocumentsButton.isEnabled = true
+            }
+        }
     }
 }
