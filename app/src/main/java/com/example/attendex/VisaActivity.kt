@@ -213,121 +213,60 @@ class VisaActivity : AppCompatActivity() {
     }
 
     private fun uploadFormData() {
-        val name = nameInput.text.toString()
-        val className = classInput.text.toString()
-        val regNo = rollInput.text.toString()
-        val reason = reasonInput.text.toString()
-        val teacher = teacherSpinner.text.toString()
-        val startDate = startDateInput.text.toString()
-        val endDate = endDateInput.text.toString()
+        val name = nameInput.text.toString().trim()
+        val className = classInput.text.toString().trim()
+        val regNo = rollInput.text.toString().trim()
+        val reason = reasonInput.text.toString().trim()
+        val teacher = teacherSpinner.text.toString().trim()
+        val startDate = startDateInput.text.toString().trim()
+        val endDate = endDateInput.text.toString().trim()
 
-        if (name.isEmpty() || className.isEmpty() || regNo.isEmpty() || reason.isEmpty() || teacher.isEmpty() || startDate.isEmpty() || endDate.isEmpty()) {
-            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+        // 1. Name Validation: Ensure it’s not empty and only contains alphabets.
+        if (name.isEmpty() || !name.matches("^[a-zA-Z ]+$".toRegex())) {
+            Toast.makeText(this, "Please enter a valid name", Toast.LENGTH_SHORT).show()
             return
         }
 
+        // 2. Class Validation: Ensure class input is not empty and matches a valid class format (e.g., "BCA1").
+        if (className.isEmpty() || !className.matches("^[a-zA-Z0-9]+$".toRegex())) {
+            Toast.makeText(this, "Please enter a valid class", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // 3. Registration Number Validation: Ensure it’s a valid number and of a specific length.
+        if (regNo.isEmpty() || !regNo.matches("^[0-9]{5,10}$".toRegex())) {
+            Toast.makeText(this, "Please enter a valid Registration Number", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // 4. Reason Validation: Ensure it's not empty and has a reasonable length.
+        if (reason.isEmpty() || reason.length < 10) {
+            Toast.makeText(this, "Reason is invalid and too short, add appropriate reason.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (startDate.isEmpty() || endDate.isEmpty() || teacher.isEmpty()) {
+            Toast.makeText(this, "Fields missing", Toast.LENGTH_SHORT).show()
+            return
+        }
         val formData = hashMapOf(
             "name" to name,
             "class" to className,
-            "regNo" to regNo,
+            "rollNo" to regNo,
             "reason" to reason,
             "teacher" to teacher,
             "startDate" to startDate,
-            "endDate" to endDate,
-            "status" to "Pending",
-            "timestamp" to com.google.firebase.Timestamp.now(),
-            "flightTicketPath" to if (flightTicketUri != null) "visaClaims/${regNo}_ft.jpg" else "",
-            "otherDocumentPath" to if (otherDocumentUri != null) "visaClaims/${regNo}_od.jpg" else ""
+            "endDate" to endDate
         )
 
-        db.collection("visaClaims").document(regNo)
-            .set(formData)
+        db.collection("users")
+            .add(formData)
             .addOnSuccessListener {
-                uploadImages(regNo)
+                Toast.makeText(this, "Uploaded", Toast.LENGTH_SHORT).show()
             }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Error submitting form: ${e.message}", Toast.LENGTH_SHORT).show()
+            .addOnFailureListener {
+                Toast.makeText(this, "Uploading failed: ${it.message}", Toast.LENGTH_SHORT).show()
             }
-
-        Log.d("VisaSubmitDebug", "Submitting visa claim for regNo: $regNo")
-        Log.d("VisaSubmitDebug", "Flight Ticket Path: ${formData["flightTicketPath"]}")
-        Log.d("VisaSubmitDebug", "Other Document Path: ${formData["otherDocumentPath"]}")
-    }
-
-    private fun uploadImages(regNo: String) {
-        val flightTicketRef = storage.reference.child("visaClaims/${regNo}_ft.jpg")
-        val otherDocumentRef = storage.reference.child("visaClaims/${regNo}_od.jpg")
-
-        var uploadedCount = 0
-        var totalUploads = 0
-
-        flightTicketUri?.let {
-            totalUploads++
-            flightTicketRef.putFile(it)
-                .addOnSuccessListener {
-                    uploadedCount++
-                    checkUploadCompletion(regNo, uploadedCount, totalUploads)
-                }
-                .addOnFailureListener { e ->
-                    Toast.makeText(this, "Error uploading flight ticket: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-        }
-
-        otherDocumentUri?.let {
-            totalUploads++
-            otherDocumentRef.putFile(it)
-                .addOnSuccessListener {
-                    uploadedCount++
-                    checkUploadCompletion(regNo, uploadedCount, totalUploads)
-                }
-                .addOnFailureListener { e ->
-                    Toast.makeText(this, "Error uploading other document: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-        }
-
-        if (totalUploads == 0) {
-            Toast.makeText(this, "Form submitted successfully", Toast.LENGTH_SHORT).show()
-            finish()
-        }
-    }
-
-    private fun checkUploadCompletion(regNo: String, uploadedCount: Int, totalUploads: Int) {
-        if (uploadedCount == totalUploads) {
-            db.collection("visaClaims").document(regNo)
-                .update(
-                    mapOf(
-                        "imagesUploaded" to true,
-                        "flightTicketPath" to if (flightTicketUri != null) "visaClaims/${regNo}_ft.jpg" else "",
-                        "otherDocumentPath" to if (otherDocumentUri != null) "visaClaims/${regNo}_od.jpg" else ""
-                    )
-                )
-                .addOnSuccessListener {
-                    Toast.makeText(this, "Form and images submitted successfully", Toast.LENGTH_SHORT).show()
-                    finish()
-                }
-                .addOnFailureListener { e ->
-                    Toast.makeText(this, "Error updating image status: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
-            val photoUri = FileProvider.getUriForFile(
-                this,
-                "com.example.attendex.fileprovider",
-                File(currentPhotoPath)
-            )
-            if (isCapturingFlightTicket) {
-                flightTicketUri = photoUri
-                attachFlightTicketButton.text = "Flight Ticket Attached"
-                previewFlightTicketButton.isEnabled = true
-            } else {
-                otherDocumentUri = photoUri
-                otherDocumentsButton.text = "Document Attached"
-                previewOtherDocumentsButton.isEnabled = true
-            }
-        }
     }
 }
+
