@@ -34,12 +34,12 @@
 
     <ImageView
         android:id="@+id/teacherImage"
-        android:src="@drawable/asad1"
         android:layout_width="104dp"
         android:layout_height="104dp"
-        android:layout_marginStart="156dp"
-        android:layout_marginTop="60dp"
+        android:layout_marginStart="152dp"
+        android:layout_marginTop="96dp"
         android:background="@android:color/darker_gray"
+        android:src="@drawable/asad1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/teacherName" />
 
@@ -73,7 +73,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="130dp"
+        android:layout_marginTop="252dp"
         android:layout_marginEnd="16dp"
         android:columnCount="2"
         android:rowCount="2"
@@ -101,35 +101,5 @@
 
     </GridLayout>
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/bottomNavCard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:layout_marginBottom="32dp"
-        android:outlineAmbientShadowColor="@color/GlowColor"
-        android:outlineSpotShadowColor="@color/GlowColor"
-        app:cardBackgroundColor="@color/black"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:strokeColor="@color/GlowColor"
-        app:strokeWidth="1dp">
-
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/bottom_navigation"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:background="@color/transparent"
-            app:itemActiveIndicatorStyle="@null"
-            app:itemHorizontalTranslationEnabled="true"
-            app:itemIconTint="@color/nav_color_selector"
-            app:itemRippleColor="@color/unselected_color"
-            app:itemTextColor="#FFFFFF"
-            app:labelVisibilityMode="selected"
-            app:menu="@menu/bottom_nav_menu" />
-    </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
