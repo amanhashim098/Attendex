@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     android:padding="24dp">
 
-    <!-- Student ID Field -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/studentIdLayout"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"

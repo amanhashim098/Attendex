@@ -1,18 +1,20 @@
 package com.example.attendex
 
+// Import necessary Android and Firebase libraries
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 
-class ProfileActivity : BaseActivity() {
+class ProfileActivity : AppCompatActivity() {
 
     // Firestore and Storage instances
     private val db = FirebaseFirestore.getInstance()
@@ -35,20 +37,20 @@ class ProfileActivity : BaseActivity() {
         val regNo = intent.getStringExtra("regNo")
 
         // Check if regNo is passed, if not show error and finish activity
-        if (regNo == null) {
+        if (regNo.isNullOrEmpty()) {
             Toast.makeText(this, "No RegNo found. Please login again.", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
-        // Initialize TextViews and ImageView
+        // Initialize TextViews and ImageView with correct `findViewById`
         nameText = findViewById(R.id.nameText)
         studentId = findViewById(R.id.studentId)
         classInfo = findViewById(R.id.classInfo)
         missedHours = findViewById(R.id.missedHours)
         claimedHours = findViewById(R.id.claimedHours)
         totalHours = findViewById(R.id.totalHours)
-        profileImageView = findViewById(R.id.profileImage) // Make sure to add this to your XML layout
+        profileImageView = findViewById(R.id.profileImage)
 
         // Initialize buttons
         val medicalButton: MaterialButton = findViewById(R.id.applyMedicalClaim)
@@ -90,10 +92,8 @@ class ProfileActivity : BaseActivity() {
                     missedHours.text = "$hoursMissed"
                     claimedHours.text = "$hoursClaimed"
 
-
-
                     // Load the profile image if available
-                    if (imagePath != null) {
+                    if (!imagePath.isNullOrEmpty()) {
                         Log.d("ProfileActivity", "Image Path: $imagePath") // Log the image path
                         loadImageFromStorage(imagePath)
                     } else {
@@ -110,9 +110,11 @@ class ProfileActivity : BaseActivity() {
     }
 
     private fun loadImageFromStorage(gsPath: String) {
+        // Get the reference for the image from Firebase Storage
         val storageRef = storage.getReferenceFromUrl(gsPath)
         storageRef.downloadUrl
             .addOnSuccessListener { uri ->
+                // Load the image using Glide into the ImageView
                 Glide.with(this).load(uri).into(profileImageView)
             }
             .addOnFailureListener { exception ->

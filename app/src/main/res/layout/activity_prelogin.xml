@@ -9,9 +9,6 @@
     tools:context=".prelogin"
     android:padding="24dp">
 
-    <!-- Logo Image -->
-
-    <!-- Rounded MaterialButtonToggleGroup -->
 
     <ImageView
         android:id="@+id/imageView"

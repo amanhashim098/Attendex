@@ -55,7 +55,14 @@
             android:exported="false" /> <!-- Prelogin Activity -->
         <activity
             android:name=".prelogin"
-            android:exported="false" /> <!-- File Provider (for sharing files securely) -->
+            android:exported="false" />
+
+        <activity
+            android:name=".ClaimsAdapter"
+            android:exported="false" />
+        <activity android:name=".ActivityClaims"
+                   android:exported="false" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

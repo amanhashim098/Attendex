@@ -7,10 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <!-- Centered Logo -->
-
-    <!-- Button to Navigate to PreLogin -->
-
     <ImageView
         android:id="@+id/imageView4"
         android:layout_width="238dp"
