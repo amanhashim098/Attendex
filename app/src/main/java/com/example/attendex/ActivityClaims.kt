@@ -78,10 +78,6 @@ class ActivityClaims : AppCompatActivity() {
                     append("Images Uploaded: ${claim.imagesUploaded}\n")
                     append("Periods Missed: ${claim.periodsMissed.joinToString(", ")}\n")
                     append("Reg No: ${claim.regNo}\n")
-                    append("Hours Claimed: ${claim.hoursClaimed}\n")
-                    append("Hours Missed: ${claim.hoursMissed}\n")
-                    append("Pass: ${claim.pass}\n")
-                    append("Total Hours: ${claim.totalHours}\n")
                 }
                 is MedicalClaim -> {
                     append("Type: Medical\n")
