@@ -97,7 +97,6 @@ fun createClaimFromFirestore(
             imagesUploaded = data["imagesUploaded"] as? Boolean ?: false,
             periodsMissed = (data["periodsMissed"] as? List<*>)?.mapNotNull { it as? String } ?: listOf(),
             regNo = data["regNo"] as? String ?: "",
-
             photoUrl = data["photoUrl"] as? String ?: "",
 
         )
@@ -127,7 +126,7 @@ fun createClaimFromFirestore(
             flightTicketPath = data["flightTicketPath"] as? String ?: "",
             otherDocumentPath = data["otherDocumentPath"] as? String ?: "",
             reason = data["reason"] as? String ?: "",
-            rollNumber = data["rollNumber"] as? String ?: ""
+            rollNumber = data["regNo"] as? String ?: ""
         )
     }
 }
