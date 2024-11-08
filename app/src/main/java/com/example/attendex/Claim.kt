@@ -38,11 +38,10 @@ data class CoCurricularClaim(
     val imagesUploaded: Boolean,
     val periodsMissed: List<String>,
     val regNo: String,
-    val hoursClaimed: Int,
-    val hoursMissed: Int,
-    val pass: Int,
+
+
     val photoUrl: String,
-    val totalHours: Int
+
 ) : Claim() {
     override val claimType: ClaimType = ClaimType.CO_CURRICULAR
 }
@@ -98,11 +97,9 @@ fun createClaimFromFirestore(
             imagesUploaded = data["imagesUploaded"] as? Boolean ?: false,
             periodsMissed = (data["periodsMissed"] as? List<*>)?.mapNotNull { it as? String } ?: listOf(),
             regNo = data["regNo"] as? String ?: "",
-            hoursClaimed = (data["hoursClaimed"] as? Long)?.toInt() ?: 0,
-            hoursMissed = (data["hoursMissed"] as? Long)?.toInt() ?: 0,
-            pass = (data["pass"] as? Long)?.toInt() ?: 0,
+
             photoUrl = data["photoUrl"] as? String ?: "",
-            totalHours = (data["totalHours"] as? Long)?.toInt() ?: 0
+
         )
 
         ClaimType.MEDICAL -> MedicalClaim(

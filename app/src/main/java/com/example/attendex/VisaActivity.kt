@@ -294,13 +294,7 @@ class VisaActivity : AppCompatActivity() {
     private fun checkUploadCompletion(regNo: String, uploadedCount: Int, totalUploads: Int) {
         if (uploadedCount == totalUploads) {
             db.collection("visaClaims").document(regNo)
-                .update(
-                    mapOf(
-                        "imagesUploaded" to true,
-                        "flightTicketPath" to if (flightTicketUri != null) "visaClaims/${regNo}_ft.jpg" else "",
-                        "otherDocumentPath" to if (otherDocumentUri != null) "visaClaims/${regNo}_od.jpg" else ""
-                    )
-                )
+                .update("imagesUploaded", true)
                 .addOnSuccessListener {
                     Toast.makeText(this, "Form and images submitted successfully", Toast.LENGTH_SHORT).show()
                     finish()

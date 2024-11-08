@@ -115,11 +115,7 @@ class CoCurricularActivity : AppCompatActivity() {
         previewCertificateButton.setOnClickListener { previewImage(isCapturingCertificate) }
         previewOtherDocumentsButton.setOnClickListener { previewImage(!isCapturingCertificate) }
 
-        submitButton.setOnClickListener {
-            if (validateInputs()) {
-                uploadFormData()
-            }
-        }
+        submitButton.setOnClickListener { uploadFormData() }
 
         previewCertificateButton.isEnabled = false
         previewOtherDocumentsButton.isEnabled = false
@@ -229,102 +225,118 @@ class CoCurricularActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun validateInputs(): Boolean {
-        var isValid = true
-
-        // Name validation
-        if (nameInput.text.toString().trim().isEmpty() || !nameInput.text.toString().matches(Regex("^[A-Za-z ]{2,}$"))) {
-            nameInput.error = "Please enter a valid name (at least 2 letters, alphabets only)"
-            isValid = false
-        }
-
-        // Class validation
-        if (classInput.text.toString().trim().isEmpty()) {
-            classInput.error = "Class cannot be empty"
-            isValid = false
-        }
-
-        // Roll number validation (7 digits only)
-        if (rollInput.text.toString().trim().isEmpty() || !rollInput.text.toString().matches(Regex("^\\d{7}$"))) {
-            rollInput.error = "Enter a valid 7-digit roll number"
-            isValid = false
-        }
-
-        // Event validation
-        if (eventInput.text.toString().trim().isEmpty() || eventInput.text.toString().length < 3) {
-            eventInput.error = "Event name must be at least 3 characters"
-            isValid = false
-        }
-
-        // Teacher selection validation
-        if (teacherSpinner.text.toString().trim().isEmpty() || !listOf(
-                "Fabiola Pohrmen", "Resmi K R", "Vineetha K R", "Arokia Paul"
-            ).contains(teacherSpinner.text.toString())) {
-            teacherSpinner.error = "Please select a valid teacher"
-            isValid = false
-        }
-
-        // Date validation
-        val dateText = dateInput.text.toString()
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        dateFormat.isLenient = false
-        try {
-            val date = dateFormat.parse(dateText)
-            if (date.after(Date())) {
-                dateInput.error = "Date cannot be in the future"
-                isValid = false
-            }
-        } catch (e: Exception) {
-            dateInput.error = "Please enter a valid date (DD/MM/YYYY)"
-            isValid = false
-        }
-
-        // Periods missed validation (Optional but at least one if applicable)
-        if (periodCheckboxes.none { it.isChecked }) {
-            Toast.makeText(this, "Select at least one period missed", Toast.LENGTH_SHORT).show()
-            isValid = false
-        }
-
-        // Attachments validation (Mandatory)
-        if (certificateUri == null && otherDocumentUri == null) {
-            Toast.makeText(this, "Attach at least one document", Toast.LENGTH_SHORT).show()
-            isValid = false
-        }
-
-        return isValid
-    }
-
     private fun uploadFormData() {
-        val userData = hashMapOf(
-            "name" to nameInput.text.toString(),
-            "class" to classInput.text.toString(),
-            "roll_no" to rollInput.text.toString(),
-            "event" to eventInput.text.toString(),
-            "teacher" to teacherSpinner.text.toString(),
-            "date" to dateInput.text.toString(),
+        val name = nameInput.text.toString()
+        val className = classInput.text.toString()
+        val regNo = rollInput.text.toString()
+        val event = eventInput.text.toString()
+        val teacher = teacherSpinner.text.toString()
+        val date = dateInput.text.toString()
+        val activityType = when {
+            coCurricularRadio.isChecked -> "Co-curricular"
+            extraCurricularRadio.isChecked -> "Extra-curricular"
+            deptActivitiesRadio.isChecked -> "Dept. Activities"
+            else -> ""
+        }
+        val periodsMissed = periodCheckboxes.mapIndexedNotNull { index, checkbox ->
+            if (checkbox.isChecked) "P${index + 1}" else null
+        }
+
+        if (name.isEmpty() || className.isEmpty() || regNo.isEmpty() || event.isEmpty() || teacher.isEmpty() || date.isEmpty() || activityType.isEmpty()) {
+            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val formData = hashMapOf(
+            "name" to name,
+            "class" to className,
+            "regNo" to regNo,
+            "event" to event,
+            "teacher" to teacher,
+            "date" to date,
+            "activityType" to activityType,
+            "periodsMissed" to periodsMissed,
+            "timestamp" to com.google.firebase.Timestamp.now()
         )
 
-        db.collection("users")
-            .add(userData)
+        db.collection("coCurricularClaims").document(regNo)
+            .set(formData)
             .addOnSuccessListener {
-                Toast.makeText(this, "Successfully Submitted", Toast.LENGTH_SHORT).show()
-                resetInputs()
+                uploadImages(regNo)
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Failed to submit data", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Error submitting form: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
-    private fun resetInputs() {
-        nameInput.text.clear()
-        classInput.text.clear()
-        rollInput.text.clear()
-        eventInput.text.clear()
-        teacherSpinner.text.clear()
-        dateInput.text.clear()
-        periodCheckboxes.forEach { it.isChecked = false }
-        certificateUri = null
-        otherDocumentUri = null
+    private fun uploadImages(regNo: String) {
+        val certificateRef = storage.reference.child("coCurricularClaims/${regNo}_cc.jpg")
+        val otherDocumentRef = storage.reference.child("coCurricularClaims/${regNo}_od.jpg")
+
+        var uploadedCount = 0
+        var totalUploads = 0
+
+        certificateUri?.let {
+            totalUploads++
+            certificateRef.putFile(it)
+                .addOnSuccessListener {
+                    uploadedCount++
+                    checkUploadCompletion(regNo, uploadedCount, totalUploads)
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Error uploading certificate: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+
+        otherDocumentUri?.let {
+            totalUploads++
+            otherDocumentRef.putFile(it)
+                .addOnSuccessListener {
+                    uploadedCount++
+                    checkUploadCompletion(regNo, uploadedCount, totalUploads)
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Error uploading other document: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+
+        if (totalUploads == 0) {
+            Toast.makeText(this, "Form submitted successfully", Toast.LENGTH_SHORT).show()
+            finish()
+        }
     }
 
+    private fun checkUploadCompletion(regNo: String, uploadedCount: Int, totalUploads: Int) {
+        if (uploadedCount == totalUploads) {
+            db.collection("coCurricularClaims").document(regNo)
+                .update("imagesUploaded", true)
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Form and images submitted successfully", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Error updating image status: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
+            val photoUri = FileProvider.getUriForFile(
+                this,
+                "com.example.attendex.fileprovider",
+                File(currentPhotoPath)
+            )
+            if (isCapturingCertificate) {
+                certificateUri = photoUri
+                attachCertificateButton.text = "Certificate Attached"
+                previewCertificateButton.isEnabled = true
+            } else {
+                otherDocumentUri = photoUri
+                otherDocumentsButton.text = "Document Attached"
+                previewOtherDocumentsButton.isEnabled = true
+            }
+        }
+    }
 }

@@ -90,10 +90,7 @@ class ActivityClaims : AppCompatActivity() {
                     append("Images Uploaded: ${claim.imagesUploaded}\n")
                     append("Periods Missed: ${claim.periodsMissed.joinToString(", ")}\n")
                     append("Reg No: ${claim.regNo}\n")
-                    append("Hours Claimed: ${claim.hoursClaimed}\n")
-                    append("Hours Missed: ${claim.hoursMissed}\n")
-                    append("Pass: ${claim.pass}\n")
-                    append("Total Hours: ${claim.totalHours}\n")
+
 
                     loadCoCurricularImages(claim.id, imageView)
                 }
@@ -173,37 +170,42 @@ class ActivityClaims : AppCompatActivity() {
     }
 
     private fun loadMedicalImage(claimId: String, imageView: ImageView) {
-        storage.reference.child("medicalClaims").listAll()
-            .addOnSuccessListener { result ->
-                val matchingFolder = result.prefixes.find { it.name == claimId }
-                if (matchingFolder != null) {
-                    matchingFolder.listAll().addOnSuccessListener { folderContents ->
-                        if (folderContents.items.isNotEmpty()) {
-                            folderContents.items.first().downloadUrl.addOnSuccessListener { uri ->
-                                Glide.with(this)
-                                    .load(uri)
-                                    .into(imageView)
-                                imageView.visibility = View.VISIBLE
+        Log.d("MedicalImageDebug", "Loading medical image for claim: $claimId")
 
-                                imageView.setOnClickListener {
-                                    showFullSizeImage(uri.toString())
-                                }
-                            }
-                        } else {
-                            imageView.visibility = View.GONE
-                            Toast.makeText(this, "No images found in claim folder", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                } else {
-                    imageView.visibility = View.GONE
-                    Toast.makeText(this, "No folder found for this claim", Toast.LENGTH_SHORT).show()
-                }
+        val certificateRef = storage.reference.child("medicalClaims/${claimId}_certificate.jpg")
+        certificateRef.downloadUrl.addOnSuccessListener { uri ->
+            Log.d("MedicalImageDebug", "Successfully loaded certificate: $uri")
+            Glide.with(this)
+                .load(uri)
+                .into(imageView)
+            imageView.visibility = View.VISIBLE
+
+            imageView.setOnClickListener {
+                showFullSizeImage(uri.toString())
             }
-            .addOnFailureListener { exception ->
-                Log.e("ActivityClaims", "Error listing medical claim folders", exception)
-                imageView.visibility = View.GONE
-                Toast.makeText(this, "Failed to load medical claim image", Toast.LENGTH_SHORT).show()
+        }.addOnFailureListener { exception ->
+            Log.e("MedicalImageDebug", "Failed to load certificate", exception)
+            loadOtherMedicalDocument(claimId, imageView)
+        }
+    }
+
+    private fun loadOtherMedicalDocument(claimId: String, imageView: ImageView) {
+        val otherDocRef = storage.reference.child("medicalClaims/${claimId}_other.jpg")
+        otherDocRef.downloadUrl.addOnSuccessListener { uri ->
+            Log.d("MedicalImageDebug", "Successfully loaded other document: $uri")
+            Glide.with(this)
+                .load(uri)
+                .into(imageView)
+            imageView.visibility = View.VISIBLE
+
+            imageView.setOnClickListener {
+                showFullSizeImage(uri.toString())
             }
+        }.addOnFailureListener { exception ->
+            Log.e("MedicalImageDebug", "Failed to load other document", exception)
+            imageView.visibility = View.GONE
+            Toast.makeText(this, "No images found for this claim", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun loadVisaImage(claim: VisaClaim, imageView: ImageView) {
