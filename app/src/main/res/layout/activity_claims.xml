@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <!-- Heading TextView for Status Page -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
