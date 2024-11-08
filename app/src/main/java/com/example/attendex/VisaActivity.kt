@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
@@ -42,6 +43,9 @@ class VisaActivity : AppCompatActivity() {
 
     private lateinit var currentPhotoPath: String
     private var isCapturingFlightTicket = true
+    private var flightTicketUri: Uri? = null
+    private var otherDocumentUri: Uri? = null
+
     private lateinit var db: FirebaseFirestore
     private lateinit var storage: FirebaseStorage
 
@@ -67,10 +71,10 @@ class VisaActivity : AppCompatActivity() {
         classInput = findViewById(R.id.class_input)
         rollInput = findViewById(R.id.roll_input)
         reasonInput = findViewById(R.id.reason_input)
+        teacherSpinner = findViewById(R.id.teacher_spinner)
         startDateInput = findViewById(R.id.start_date_input)
         endDateInput = findViewById(R.id.end_date_input)
 
-        teacherSpinner = findViewById(R.id.teacher_spinner)
         val teachers = arrayOf("Fabiola Pohrmen", "Resmi K R", "Vineetha K R", "Arokia Paul")
         val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, teachers)
         teacherSpinner.setAdapter(adapter)
@@ -82,7 +86,6 @@ class VisaActivity : AppCompatActivity() {
                 startDateInput.setText(date)
             }
         }
-
         endDateInput.setOnClickListener {
             showDatePickerDialog { date ->
                 endDateInput.setText(date)
@@ -110,9 +113,7 @@ class VisaActivity : AppCompatActivity() {
         previewFlightTicketButton.setOnClickListener { previewImage(isCapturingFlightTicket) }
         previewOtherDocumentsButton.setOnClickListener { previewImage(!isCapturingFlightTicket) }
 
-        submitButton.setOnClickListener {
-            handleSubmit()
-        }
+        submitButton.setOnClickListener { uploadFormData() }
 
         previewFlightTicketButton.isEnabled = false
         previewOtherDocumentsButton.isEnabled = false
@@ -198,19 +199,6 @@ class VisaActivity : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
-            if (isCapturingFlightTicket) {
-                attachFlightTicketButton.text = "Flight Ticket Attached"
-                previewFlightTicketButton.isEnabled = true
-            } else {
-                otherDocumentsButton.text = "Document Attached"
-                previewOtherDocumentsButton.isEnabled = true
-            }
-        }
-    }
-
     private fun previewImage(isFlightTicket: Boolean) {
         val photoURI = FileProvider.getUriForFile(
             this,
@@ -224,100 +212,122 @@ class VisaActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun handleSubmit() {
+    private fun uploadFormData() {
         val name = nameInput.text.toString()
         val className = classInput.text.toString()
-        val rollNumber = rollInput.text.toString()
+        val regNo = rollInput.text.toString()
         val reason = reasonInput.text.toString()
         val teacher = teacherSpinner.text.toString()
         val startDate = startDateInput.text.toString()
         val endDate = endDateInput.text.toString()
 
-        if (name.isEmpty() || className.isEmpty() || rollNumber.isEmpty() || reason.isEmpty() || teacher.isEmpty() || startDate.isEmpty() || endDate.isEmpty()) {
-            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
+        if (name.isEmpty() || className.isEmpty() || regNo.isEmpty() || reason.isEmpty() || teacher.isEmpty() || startDate.isEmpty() || endDate.isEmpty()) {
+            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
             return
         }
 
-        uploadImagesAndSubmitClaim(name, className, rollNumber, reason, teacher, startDate, endDate)
-    }
-
-    private fun uploadImagesAndSubmitClaim(name: String, className: String, rollNumber: String, reason: String, teacher: String, startDate: String, endDate: String) {
-        val flightTicketFile = if (isCapturingFlightTicket) File(currentPhotoPath) else null
-        val otherDocumentFile = if (!isCapturingFlightTicket) File(currentPhotoPath) else null
-
-        val uploadTasks = mutableListOf<Pair<String, File?>>()
-        if (flightTicketFile != null) {
-            uploadTasks.add("flightTicket" to flightTicketFile)
-        }
-        if (otherDocumentFile != null) {
-            uploadTasks.add("otherDocument" to otherDocumentFile)
-        }
-
-        val uploadedUrls = mutableMapOf<String, String>()
-
-        fun uploadNextImage() {
-            if (uploadTasks.isEmpty()) {
-                // All images uploaded, now submit the claim
-                submitClaim(name, className, rollNumber, reason, teacher, startDate, endDate, uploadedUrls)
-                return
-            }
-
-            val (type, file) = uploadTasks.removeAt(0)
-            val storageRef = storage.reference.child("visaClaims/${file?.name}")
-
-            storageRef.putFile(Uri.fromFile(file))
-                .addOnSuccessListener { taskSnapshot ->
-                    taskSnapshot.storage.downloadUrl.addOnSuccessListener { uri ->
-                        uploadedUrls[type] = uri.toString()
-                        uploadNextImage()
-                    }
-                }
-                .addOnFailureListener { e ->
-                    Toast.makeText(this, "Failed to upload $type: ${e.message}", Toast.LENGTH_SHORT).show()
-                    uploadNextImage()
-                }
-        }
-
-        uploadNextImage()
-    }
-
-    private fun submitClaim(name: String, className: String, rollNumber: String, reason: String, teacher: String, startDate: String, endDate: String, uploadedUrls: Map<String, String>) {
-        val visaClaim = hashMapOf(
+        val formData = hashMapOf(
             "name" to name,
             "class" to className,
-            "rollNumber" to rollNumber,
+            "regNo" to regNo,
             "reason" to reason,
             "teacher" to teacher,
             "startDate" to startDate,
             "endDate" to endDate,
-            "flightTicketUrl" to (uploadedUrls["flightTicket"] ?: ""),
-            "otherDocumentUrl" to (uploadedUrls["otherDocument"] ?: ""),
-            "timestamp" to com.google.firebase.Timestamp.now()
+            "status" to "Pending",
+            "timestamp" to com.google.firebase.Timestamp.now(),
+            "flightTicketPath" to if (flightTicketUri != null) "visaClaims/${regNo}_ft.jpg" else "",
+            "otherDocumentPath" to if (otherDocumentUri != null) "visaClaims/${regNo}_od.jpg" else ""
         )
 
-        db.collection("visaClaims")
-            .add(visaClaim)
-            .addOnSuccessListener { documentReference ->
-                Toast.makeText(this, "Visa claim submitted successfully", Toast.LENGTH_SHORT).show()
-                clearForm()
+        db.collection("visaClaims").document(regNo)
+            .set(formData)
+            .addOnSuccessListener {
+                uploadImages(regNo)
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Error submitting visa claim: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Error submitting form: ${e.message}", Toast.LENGTH_SHORT).show()
             }
+
+        Log.d("VisaSubmitDebug", "Submitting visa claim for regNo: $regNo")
+        Log.d("VisaSubmitDebug", "Flight Ticket Path: ${formData["flightTicketPath"]}")
+        Log.d("VisaSubmitDebug", "Other Document Path: ${formData["otherDocumentPath"]}")
     }
 
-    private fun clearForm() {
-        nameInput.text.clear()
-        classInput.text.clear()
-        rollInput.text.clear()
-        reasonInput.text.clear()
-        teacherSpinner.text.clear()
-        startDateInput.text.clear()
-        endDateInput.text.clear()
-        attachFlightTicketButton.text = "Attach Flight Ticket"
-        otherDocumentsButton.text = "Other Documents"
-        previewFlightTicketButton.isEnabled = false
-        previewOtherDocumentsButton.isEnabled = false
-        currentPhotoPath = ""
+    private fun uploadImages(regNo: String) {
+        val flightTicketRef = storage.reference.child("visaClaims/${regNo}_ft.jpg")
+        val otherDocumentRef = storage.reference.child("visaClaims/${regNo}_od.jpg")
+
+        var uploadedCount = 0
+        var totalUploads = 0
+
+        flightTicketUri?.let {
+            totalUploads++
+            flightTicketRef.putFile(it)
+                .addOnSuccessListener {
+                    uploadedCount++
+                    checkUploadCompletion(regNo, uploadedCount, totalUploads)
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Error uploading flight ticket: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+
+        otherDocumentUri?.let {
+            totalUploads++
+            otherDocumentRef.putFile(it)
+                .addOnSuccessListener {
+                    uploadedCount++
+                    checkUploadCompletion(regNo, uploadedCount, totalUploads)
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Error uploading other document: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+
+        if (totalUploads == 0) {
+            Toast.makeText(this, "Form submitted successfully", Toast.LENGTH_SHORT).show()
+            finish()
+        }
+    }
+
+    private fun checkUploadCompletion(regNo: String, uploadedCount: Int, totalUploads: Int) {
+        if (uploadedCount == totalUploads) {
+            db.collection("visaClaims").document(regNo)
+                .update(
+                    mapOf(
+                        "imagesUploaded" to true,
+                        "flightTicketPath" to if (flightTicketUri != null) "visaClaims/${regNo}_ft.jpg" else "",
+                        "otherDocumentPath" to if (otherDocumentUri != null) "visaClaims/${regNo}_od.jpg" else ""
+                    )
+                )
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Form and images submitted successfully", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Error updating image status: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
+            val photoUri = FileProvider.getUriForFile(
+                this,
+                "com.example.attendex.fileprovider",
+                File(currentPhotoPath)
+            )
+            if (isCapturingFlightTicket) {
+                flightTicketUri = photoUri
+                attachFlightTicketButton.text = "Flight Ticket Attached"
+                previewFlightTicketButton.isEnabled = true
+            } else {
+                otherDocumentUri = photoUri
+                otherDocumentsButton.text = "Document Attached"
+                previewOtherDocumentsButton.isEnabled = true
+            }
+        }
     }
 }
