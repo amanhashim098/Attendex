@@ -113,7 +113,7 @@ class VisaActivity : AppCompatActivity() {
         previewFlightTicketButton.setOnClickListener { previewImage(isCapturingFlightTicket) }
         previewOtherDocumentsButton.setOnClickListener { previewImage(!isCapturingFlightTicket) }
 
-        submitButton.setOnClickListener { uploadFormData() }
+        submitButton.setOnClickListener { validateAndSubmitForm() }
 
         previewFlightTicketButton.isEnabled = false
         previewOtherDocumentsButton.isEnabled = false
@@ -212,20 +212,38 @@ class VisaActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun uploadFormData() {
-        val name = nameInput.text.toString()
-        val className = classInput.text.toString()
-        val regNo = rollInput.text.toString()
-        val reason = reasonInput.text.toString()
-        val teacher = teacherSpinner.text.toString()
-        val startDate = startDateInput.text.toString()
-        val endDate = endDateInput.text.toString()
+    private fun validateAndSubmitForm() {
+        val name = nameInput.text.toString().trim()
+        val className = classInput.text.toString().trim()
+        val regNo = rollInput.text.toString().trim()
+        val reason = reasonInput.text.toString().trim()
+        val teacher = teacherSpinner.text.toString().trim()
+        val startDate = startDateInput.text.toString().trim()
+        val endDate = endDateInput.text.toString().trim()
 
-        if (name.isEmpty() || className.isEmpty() || regNo.isEmpty() || reason.isEmpty() || teacher.isEmpty() || startDate.isEmpty() || endDate.isEmpty()) {
-            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
-            return
+        when {
+            name.isEmpty() -> showToast("Name is required.")
+            className.isEmpty() -> showToast("Class is required.")
+            regNo.length != 7 -> showToast("Registration number must be 7 digits.")
+            reason.isEmpty() -> showToast("Reason for leave is required.")
+            teacher.isEmpty() -> showToast("Please select a teacher.")
+            startDate.isEmpty() -> showToast("Start date is required.")
+            endDate.isEmpty() -> showToast("End date is required.")
+            flightTicketUri == null -> showToast("Flight ticket is required.")
+            startDate > endDate -> showToast("End date cannot be before start date.")
+            else -> uploadFormData(name, className, regNo, reason, teacher, startDate, endDate)
         }
+    }
 
+    private fun uploadFormData(
+        name: String,
+        className: String,
+        regNo: String,
+        reason: String,
+        teacher: String,
+        startDate: String,
+        endDate: String
+    ) {
         val formData = hashMapOf(
             "name" to name,
             "class" to className,
@@ -323,5 +341,9 @@ class VisaActivity : AppCompatActivity() {
                 previewOtherDocumentsButton.isEnabled = true
             }
         }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

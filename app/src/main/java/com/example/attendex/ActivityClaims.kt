@@ -136,7 +136,7 @@ class ActivityClaims : AppCompatActivity() {
     private fun loadCoCurricularImages(claimId: String, imageView: ImageView) {
         val ccImageRef = storage.reference
             .child("coCurricularClaims")
-            .child("${claimId}_cc.jpg")
+            .child("${claimId}_certificate.jpg")
 
         ccImageRef.downloadUrl.addOnSuccessListener { uri ->
             Glide.with(this)

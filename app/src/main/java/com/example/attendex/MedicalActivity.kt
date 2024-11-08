@@ -207,7 +207,7 @@ class MedicalActivity : AppCompatActivity() {
         when {
             name.isEmpty() -> showToast("Name is required.")
             className.isEmpty() -> showToast("Class is required.")
-            regNo.length != 7 -> showToast("Roll number must be 7 digits.")
+            regNo.length != 7 -> showToast("Registration number must be 7 digits.")
             reason.isEmpty() -> showToast("Reason for leave is required.")
             teacher.isEmpty() -> showToast("Please select a teacher.")
             startDate.isEmpty() -> showToast("Start date is required.")

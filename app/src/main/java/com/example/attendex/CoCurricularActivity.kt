@@ -115,7 +115,7 @@ class CoCurricularActivity : AppCompatActivity() {
         previewCertificateButton.setOnClickListener { previewImage(isCapturingCertificate) }
         previewOtherDocumentsButton.setOnClickListener { previewImage(!isCapturingCertificate) }
 
-        submitButton.setOnClickListener { uploadFormData() }
+        submitButton.setOnClickListener { validateAndSubmitForm() }
 
         previewCertificateButton.isEnabled = false
         previewOtherDocumentsButton.isEnabled = false
@@ -138,10 +138,12 @@ class CoCurricularActivity : AppCompatActivity() {
         val month = calendar.get(Calendar.MONTH)
         val day = calendar.get(Calendar.DAY_OF_MONTH)
 
-        val datePickerDialog = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
-            val formattedDate = String.format("%02d/%02d/%04d", selectedDay, selectedMonth + 1, selectedYear)
-            onDateSet(formattedDate)
-        }, year, month, day)
+        val datePickerDialog =
+            DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
+                val formattedDate =
+                    String.format("%02d/%02d/%04d", selectedDay, selectedMonth + 1, selectedYear)
+                onDateSet(formattedDate)
+            }, year, month, day)
 
         datePickerDialog.show()
     }
@@ -166,7 +168,11 @@ class CoCurricularActivity : AppCompatActivity() {
                 val photoFile: File? = try {
                     createImageFile()
                 } catch (ex: IOException) {
-                    Toast.makeText(this, "Error occurred while creating the File", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        "Error occurred while creating the File",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     null
                 }
                 photoFile?.also {
@@ -184,7 +190,8 @@ class CoCurricularActivity : AppCompatActivity() {
 
     @Throws(IOException::class)
     private fun createImageFile(): File {
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val timeStamp: String =
+            SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(
             "JPEG_${timeStamp}_",
@@ -206,7 +213,11 @@ class CoCurricularActivity : AppCompatActivity() {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                     dispatchTakePictureIntent()
                 } else {
-                    Toast.makeText(this, "Camera permission is required to take pictures", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        "Camera permission is required to take pictures",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
@@ -225,6 +236,46 @@ class CoCurricularActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    private fun validateAndSubmitForm() {
+        val name = nameInput.text.toString().trim()
+        val className = classInput.text.toString().trim()
+        val regNo = rollInput.text.toString().trim()
+        val event = eventInput.text.toString().trim()
+        val teacher = teacherSpinner.text.toString().trim()
+        val date = dateInput.text.toString().trim()
+
+        if (name.isEmpty()) {
+            nameInput.error = "Name is required"
+            return
+        }
+        if (className.isEmpty()) {
+            classInput.error = "Class is required"
+            return
+        }
+        if (regNo.isEmpty()) {
+            rollInput.error = "Roll Number is required"
+            return
+        }
+        if (event.isEmpty()) {
+            eventInput.error = "Event is required"
+            return
+        }
+        if (teacher.isEmpty()) {
+            teacherSpinner.error = "Teacher selection is required"
+            return
+        }
+        if (date.isEmpty()) {
+            dateInput.error = "Date is required"
+            return
+        }
+        if (!(coCurricularRadio.isChecked || extraCurricularRadio.isChecked || deptActivitiesRadio.isChecked)) {
+            Toast.makeText(this, "Please select an activity type", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        uploadFormData()
+    }
+
     private fun uploadFormData() {
         val name = nameInput.text.toString()
         val className = classInput.text.toString()
@@ -238,14 +289,6 @@ class CoCurricularActivity : AppCompatActivity() {
             deptActivitiesRadio.isChecked -> "Dept. Activities"
             else -> ""
         }
-        val periodsMissed = periodCheckboxes.mapIndexedNotNull { index, checkbox ->
-            if (checkbox.isChecked) "P${index + 1}" else null
-        }
-
-        if (name.isEmpty() || className.isEmpty() || regNo.isEmpty() || event.isEmpty() || teacher.isEmpty() || date.isEmpty() || activityType.isEmpty()) {
-            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
-            return
-        }
 
         val formData = hashMapOf(
             "name" to name,
@@ -255,8 +298,7 @@ class CoCurricularActivity : AppCompatActivity() {
             "teacher" to teacher,
             "date" to date,
             "activityType" to activityType,
-            "periodsMissed" to periodsMissed,
-            "timestamp" to com.google.firebase.Timestamp.now()
+            "periods" to periodCheckboxes.filter { it.isChecked }.map { it.text.toString() }
         )
 
         db.collection("coCurricularClaims").document(regNo)
@@ -265,13 +307,14 @@ class CoCurricularActivity : AppCompatActivity() {
                 uploadImages(regNo)
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Error submitting form: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
             }
+
     }
 
     private fun uploadImages(regNo: String) {
-        val certificateRef = storage.reference.child("coCurricularClaims/${regNo}_cc.jpg")
-        val otherDocumentRef = storage.reference.child("coCurricularClaims/${regNo}_od.jpg")
+        val certificateRef = storage.reference.child("coCurricularClaims/${regNo}_certificate.jpg")
+        val otherDocumentRef = storage.reference.child("coCurricularClaims/${regNo}_other.jpg")
 
         var uploadedCount = 0
         var totalUploads = 0
@@ -284,7 +327,11 @@ class CoCurricularActivity : AppCompatActivity() {
                     checkUploadCompletion(regNo, uploadedCount, totalUploads)
                 }
                 .addOnFailureListener { e ->
-                    Toast.makeText(this, "Error uploading certificate: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        "Error uploading certificate: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
         }
 
@@ -296,7 +343,11 @@ class CoCurricularActivity : AppCompatActivity() {
                     checkUploadCompletion(regNo, uploadedCount, totalUploads)
                 }
                 .addOnFailureListener { e ->
-                    Toast.makeText(this, "Error uploading other document: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        "Error uploading other document: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
         }
 
@@ -309,13 +360,27 @@ class CoCurricularActivity : AppCompatActivity() {
     private fun checkUploadCompletion(regNo: String, uploadedCount: Int, totalUploads: Int) {
         if (uploadedCount == totalUploads) {
             db.collection("coCurricularClaims").document(regNo)
-                .update("imagesUploaded", true)
+                .update(
+                    mapOf(
+                        "imagesUploaded" to true,
+                        "certificatePath" to if (certificateUri != null) "coCurricularClaims/${regNo}_certificate.jpg" else "",
+                        "otherDocumentPath" to if (otherDocumentUri != null) "coCurricularClaims/${regNo}_other.jpg" else ""
+                    )
+                )
                 .addOnSuccessListener {
-                    Toast.makeText(this, "Form and images submitted successfully", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        "Form and images submitted successfully",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     finish()
                 }
                 .addOnFailureListener { e ->
-                    Toast.makeText(this, "Error updating image status: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        "Error updating image status: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
         }
     }
@@ -339,4 +404,11 @@ class CoCurricularActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
 }
+
+
